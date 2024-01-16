@@ -19,7 +19,7 @@ func UploadFile(c *gin.Context) {
 	}
 
 	f := models.File{
-		Location: path,
+		FileName: path,
 	}
 
 	result := initializers.DB.Create(&f)
