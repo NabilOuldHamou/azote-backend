@@ -4,6 +4,7 @@ import (
 	"azote-backend/api"
 	"azote-backend/controllers"
 	"azote-backend/initializers"
+	"azote-backend/middleware"
 	"github.com/gin-gonic/gin"
 	"log"
 	"os"
@@ -31,7 +32,8 @@ func main() {
 	// Files
 	api.Router.Static("assets", "./assets/images")
 
-	// Posts
+	// Posts (middleware to add)
+	api.Api.POST("/posts", middleware.RequireAuth, controllers.CreatePost)
 
 	// Starting
 	err := api.Router.Run()

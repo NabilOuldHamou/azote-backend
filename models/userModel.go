@@ -7,14 +7,15 @@ import (
 )
 
 type User struct {
-	ID        uuid.UUID `gorm:"type:char(36);primary_key;"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Avatar    File   `gorm:"foreignKey:UserID;"`
-	Username  string `gorm:"unique"`
-	Email     string `gorm:"unique"`
-	Password  string `json:"-"`
-	Posts     []Post `gorm:"foreignKey:Author;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	ID          uuid.UUID `gorm:"type:char(36);primary_key;"`
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	Avatar      File   `gorm:"foreignKey:UserID;"`
+	Username    string `gorm:"unique"`
+	DisplayName string
+	Email       string `gorm:"unique"`
+	Password    string `json:"-"`
+	Posts       []Post `gorm:"foreignKey:Author;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 func (user *User) BeforeCreate(tx *gorm.DB) (err error) {

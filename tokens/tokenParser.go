@@ -19,12 +19,12 @@ type UserSession struct {
 }
 
 func ParseToken(c *gin.Context) (UserSession, error) {
-	tokenString, err := c.Cookie("Authorization")
-	if len(tokenString) == 0 || err != nil {
-		return UserSession{}, errors.New("cookie not found")
+	tokenString := c.GetHeader("Authorization")
+	if len(tokenString) == 0 {
+		return UserSession{}, errors.New("header not found")
 	}
 
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	token, _ := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}

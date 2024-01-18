@@ -16,9 +16,10 @@ import (
 
 func Signup(c *gin.Context) {
 	var body struct {
-		Username string
-		Email    string
-		Password string
+		Username    string
+		DisplayName string
+		Email       string
+		Password    string
 	}
 
 	if err := c.Bind(&body); err != nil {
@@ -37,9 +38,10 @@ func Signup(c *gin.Context) {
 	}
 
 	user := models.User{
-		Username: body.Username,
-		Email:    body.Email,
-		Password: string(hashedPassword),
+		Username:    body.Username,
+		DisplayName: body.DisplayName,
+		Email:       body.Email,
+		Password:    string(hashedPassword),
 	}
 	result := initializers.DB.Create(&user)
 
