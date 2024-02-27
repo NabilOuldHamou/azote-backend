@@ -1,0 +1,18 @@
+version: "3.8"
+services:
+  app:
+    image: ouldhamounabil/azote-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      DSN: "${DSN}"
+      JWT_SECRET: "${JWT_SECRET}"
+      GIN_MODE: "${GIN_MODE}"
+    volumes:
+      - assets:/app/assets
+
+volumes:
+  assets:
