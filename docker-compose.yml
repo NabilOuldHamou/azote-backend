@@ -12,7 +12,7 @@ services:
       JWT_SECRET: "${JWT_SECRET}"
       GIN_MODE: "${GIN_MODE}"
     volumes:
-      - assets:/app/assets
+      - ./assets:/data/assets
 
 volumes:
   assets:

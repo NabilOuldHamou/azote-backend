@@ -5,22 +5,19 @@ import (
 	"os"
 )
 
-func CreateAssetsFolder() {
+var DebugBasePath string = "./assets/"
+var ReleaseBasePath string = "/data/assets/"
 
-	if _, err := os.Stat("assets/images"); os.IsNotExist(err) {
-		if err := os.MkdirAll("assets/images", os.ModePerm); err != nil {
+func CreateAssetsFolder(basePath string) {
+
+	if _, err := os.Stat(basePath + "images"); os.IsNotExist(err) {
+		if err := os.MkdirAll(basePath+"images", os.ModePerm); err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	if _, err := os.Stat("assets/audios"); os.IsNotExist(err) {
-		if err := os.MkdirAll("assets/audios", os.ModePerm); err != nil {
-			log.Fatal(err)
-		}
-	}
-
-	if _, err := os.Stat("assets/videos"); os.IsNotExist(err) {
-		if err := os.MkdirAll("assets/videos", os.ModePerm); err != nil {
+	if _, err := os.Stat(basePath + "videos"); os.IsNotExist(err) {
+		if err := os.MkdirAll(basePath+"videos", os.ModePerm); err != nil {
 			log.Fatal(err)
 		}
 	}

@@ -10,9 +10,16 @@ import (
 	"os"
 )
 
+var currentMode string
+
 func init() {
 	initializers.LoadEnv()
-	initializers.CreateAssetsFolder()
+	currentMode = os.Getenv("GIN_MODE")
+	if currentMode == "debug" {
+		initializers.CreateAssetsFolder(initializers.DebugBasePath)
+	} else {
+		initializers.CreateAssetsFolder(initializers.ReleaseBasePath)
+	}
 	initializers.ConnectToDB()
 }
 
@@ -30,9 +37,13 @@ func main() {
 	api.Api.GET("/users/:id", controllers.GetUserById)
 
 	// Files
-	api.Router.Static("assets", "./assets/images")
+	if currentMode == "debug" {
+		api.Router.Static("assets", initializers.DebugBasePath+"/images")
+	} else {
+		api.Router.Static("assets", initializers.ReleaseBasePath+"/images")
+	}
 
-	// Posts (middleware to add)
+	// Posts
 	api.Api.POST("/posts", middleware.RequireAuth, controllers.CreatePost)
 
 	// Starting
