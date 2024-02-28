@@ -8,20 +8,46 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"net/http"
+	"strconv"
 )
 
 // GetUsers Returns all users
 func GetUsers(c *gin.Context) {
+	page, err := strconv.Atoi(c.Query("page"))
+	if err != nil || page <= 0 {
+		page = 1
+	}
+
+	type userResponse struct {
+		ID          uuid.UUID `json:"id"`
+		Username    string    `json:"username"`
+		DisplayName string    `json:"display_name"`
+		Avatar      string    `json:"profile_picture"`
+	}
+
 	var users []models.User
 
-	result := initializers.DB.Find(&users)
+	offset := (page - 1) * 50
+
+	result := initializers.DB.Offset(offset).Limit(50).Find(&users)
 	if result.Error != nil {
 		c.Status(http.StatusBadRequest)
 		return
 	}
 
+	var response []userResponse
+	for _, user := range users {
+		respUser := userResponse{
+			ID:          user.ID,
+			Username:    user.Username,
+			DisplayName: user.DisplayName,
+			Avatar:      user.Avatar.FileName,
+		}
+		response = append(response, respUser)
+	}
+
 	c.JSON(http.StatusAccepted, gin.H{
-		"users": users,
+		"users": response,
 	})
 }
 
