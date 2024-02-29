@@ -114,6 +114,10 @@ func Login(c *gin.Context) {
 	})
 }
 
+func ValidateToken(c *gin.Context) {
+	c.AbortWithStatus(http.StatusAccepted)
+}
+
 func createToken(userId uuid.UUID) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"bearer":    userId,

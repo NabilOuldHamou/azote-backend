@@ -31,6 +31,7 @@ func main() {
 	// Auth
 	api.Api.POST("/signup", controllers.Signup)
 	api.Api.POST("/login", controllers.Login)
+	api.Api.GET("/validate", middleware.RequireAuth, controllers.ValidateToken)
 
 	// Users
 	api.Api.GET("/users", controllers.GetUsers)
