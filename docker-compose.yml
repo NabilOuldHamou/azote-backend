@@ -1,6 +1,7 @@
 version: "3.8"
 services:
   app:
+    platform: linux/arm64
     image: ouldhamounabil/azote-backend
     build:
       context: .
@@ -12,7 +13,7 @@ services:
       JWT_SECRET: "${JWT_SECRET}"
       GIN_MODE: "${GIN_MODE}"
     volumes:
-      - ./assets:/data/assets
+      - "azote-assets:/data/assets"
 
 volumes:
-  assets:
+  azote-assets:
