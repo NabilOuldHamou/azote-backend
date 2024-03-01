@@ -61,7 +61,7 @@ func GetUserById(c *gin.Context) {
 	}
 
 	var user models.User
-	result := initializers.DB.First(&user, "id = ?", uniqueId)
+	result := initializers.DB.Preload("Posts").First(&user, "id = ?", uniqueId)
 
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
