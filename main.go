@@ -39,9 +39,9 @@ func main() {
 
 	// Files
 	if currentMode == "debug" {
-		api.Router.Static("assets", initializers.DebugBasePath+"/images")
+		api.Router.Static("assets", initializers.DebugBasePath)
 	} else {
-		api.Router.Static("assets", initializers.ReleaseBasePath+"/images")
+		api.Router.Static("assets", initializers.ReleaseBasePath)
 	}
 
 	// Posts
