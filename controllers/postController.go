@@ -53,7 +53,12 @@ func CreatePost(c *gin.Context) {
 	if result.Error != nil {
 
 		for _, f := range files {
-			filePath := filepath.Join("assets", f.FileName)
+			var filePath string
+			if os.Getenv("GIN_MODE") == "release" {
+				filePath = filepath.Join(initializers.ReleaseBasePath, f.FileName)
+			} else {
+				filePath = filepath.Join(initializers.DebugBasePath, f.FileName)
+			}
 			if os.Remove(filePath) != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{
 					"error": "Internal server error",
@@ -97,7 +102,12 @@ func uploadFiles(c *gin.Context, uploadedFiles []*multipart.FileHeader) ([]model
 
 		splitName := strings.Split(file.Filename, ".")
 		newName := uuid.New().String() + "." + splitName[len(splitName)-1]
-		path := "assets/" + newName
+		var path string
+		if os.Getenv("GIN_MODE") == "release" {
+			path = initializers.ReleaseBasePath + newName
+		} else {
+			path = initializers.DebugBasePath + newName
+		}
 
 		if err := c.SaveUploadedFile(file, path); err != nil {
 			return nil, err
