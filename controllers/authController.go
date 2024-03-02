@@ -83,7 +83,7 @@ func Login(c *gin.Context) {
 	}
 
 	var user models.User
-	result := initializers.DB.First(&user, "email = ?", body.Email)
+	result := initializers.DB.Preload("Posts.Files").First(&user, "email = ?", body.Email)
 
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
