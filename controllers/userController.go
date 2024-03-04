@@ -11,33 +11,41 @@ import (
 	"strconv"
 )
 
+type UserData struct {
+	ID          uuid.UUID `json:"id"`
+	Username    string    `json:"username"`
+	DisplayName string    `json:"display_name"`
+	Avatar      string    `json:"profile_picture"`
+}
+
 // GetUsers Returns all users
 func GetUsers(c *gin.Context) {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil || page <= 0 {
 		page = 1
 	}
-
-	type userResponse struct {
-		ID          uuid.UUID `json:"id"`
-		Username    string    `json:"username"`
-		DisplayName string    `json:"display_name"`
-		Avatar      string    `json:"profile_picture"`
-	}
+	username := c.Query("username")
 
 	var users []models.User
 
-	offset := (page - 1) * 50
+	offset := (page - 1) * 20
 
-	result := initializers.DB.Offset(offset).Limit(50).Find(&users)
+	var result *gorm.DB
+
+	if username != "" {
+		result = initializers.DB.Where("username LIKE ?", username+"%").Offset(offset).Limit(20).Find(&users)
+	} else {
+		result = initializers.DB.Offset(offset).Limit(20).Find(&users)
+	}
+
 	if result.Error != nil {
 		c.Status(http.StatusBadRequest)
 		return
 	}
 
-	var response []userResponse
+	var response []UserData
 	for _, user := range users {
-		respUser := userResponse{
+		respUser := UserData{
 			ID:          user.ID,
 			Username:    user.Username,
 			DisplayName: user.DisplayName,

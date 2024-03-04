@@ -34,8 +34,8 @@ func main() {
 	api.Api.GET("/validate", middleware.RequireAuth, controllers.ValidateToken)
 
 	// Users
-	api.Api.GET("/users", controllers.GetUsers)
-	api.Api.GET("/users/:id", controllers.GetUserById)
+	api.Api.GET("/users", middleware.RequireAuth, controllers.GetUsers)
+	api.Api.GET("/users/:id", middleware.RequireAuth, controllers.GetUserById)
 
 	// Files
 	if currentMode == "debug" {
@@ -46,6 +46,8 @@ func main() {
 
 	// Posts
 	api.Api.POST("/posts", middleware.RequireAuth, controllers.CreatePost)
+	api.Api.GET("/posts", middleware.RequireAuth, controllers.GetPosts)
+	api.Api.GET("/posts/:id", middleware.RequireAuth, controllers.GetPostById)
 
 	// Starting
 	err := api.Router.Run()
