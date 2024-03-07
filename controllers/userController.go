@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"net/http"
 	"strconv"
@@ -69,7 +70,7 @@ func GetUserById(c *gin.Context) {
 	}
 
 	var user models.User
-	result := initializers.DB.Preload("Posts.Files").First(&user, "id = ?", uniqueId)
+	result := initializers.DB.Preload("Avatar").Preload("Posts.Files").First(&user, "id = ?", uniqueId)
 
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -81,4 +82,69 @@ func GetUserById(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, user)
+}
+
+func UpdateUser(c *gin.Context) {
+	form, _ := c.MultipartForm()
+	uploadedFiles := form.File["Avatar"]
+	var body struct {
+		Email       string
+		Password    string
+		DisplayName string
+	}
+
+	if err := c.Bind(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request format"})
+		return
+	}
+
+	if len(uploadedFiles) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "No files were uploaded.",
+		})
+		return
+	}
+
+	files, err := uploadFiles(c, uploadedFiles)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	currentUserId := c.GetString("userId")
+	id, _ := uuid.Parse(currentUserId)
+
+	initializers.DB.Model(&files[0]).Update("user_id", id.String())
+
+	var user models.User
+	result := initializers.DB.Preload("Avatar").First(&user, "id = ?", id)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+		return
+	}
+
+	if body.Password != "" {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(body.Password), bcrypt.DefaultCost)
+		if err != nil {
+			c.Status(http.StatusInternalServerError)
+		}
+
+		initializers.DB.Model(&user).Updates(models.User{
+			Email:       body.Email,
+			Password:    string(hashedPassword),
+			DisplayName: body.DisplayName,
+		})
+	} else {
+		initializers.DB.Model(&user).Updates(models.User{
+			Email:       body.Email,
+			DisplayName: body.DisplayName,
+		})
+	}
+
+	c.JSON(http.StatusAccepted, gin.H{
+		"user": user,
+	})
+
 }

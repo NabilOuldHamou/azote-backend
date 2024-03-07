@@ -36,6 +36,7 @@ func main() {
 	// Users
 	api.Api.GET("/users", middleware.RequireAuth, controllers.GetUsers)
 	api.Api.GET("/users/:id", middleware.RequireAuth, controllers.GetUserById)
+	api.Api.PUT("/users", middleware.RequireAuth, controllers.UpdateUser)
 
 	// Files
 	if currentMode == "debug" {

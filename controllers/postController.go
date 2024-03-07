@@ -28,12 +28,20 @@ func GetPosts(c *gin.Context) {
 	if err != nil || page <= 0 {
 		page = 1
 	}
+	query := c.Query("query")
 
 	var posts []models.Post
 
 	offset := (page - 1) * 20
 
-	result := initializers.DB.Offset(offset).Limit(20).Order("created_at desc").Find(&posts)
+	var result *gorm.DB
+
+	if query != "" {
+		result = initializers.DB.Preload("Files").Where("text LIKE ?", "%"+query+"%").Offset(offset).Limit(20).Order("created_at desc").Find(&posts)
+	} else {
+		result = initializers.DB.Preload("Files").Offset(offset).Limit(20).Order("created_at desc").Find(&posts)
+	}
+
 	if result.Error != nil {
 		c.Status(http.StatusBadRequest)
 		return
