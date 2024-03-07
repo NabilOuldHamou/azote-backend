@@ -34,9 +34,9 @@ func GetUsers(c *gin.Context) {
 	var result *gorm.DB
 
 	if username != "" {
-		result = initializers.DB.Where("username LIKE ?", username+"%").Offset(offset).Limit(20).Find(&users)
+		result = initializers.DB.Preload("Avatar").Where("username LIKE ?", username+"%").Offset(offset).Limit(20).Find(&users)
 	} else {
-		result = initializers.DB.Offset(offset).Limit(20).Find(&users)
+		result = initializers.DB.Preload("Avatar").Offset(offset).Limit(20).Find(&users)
 	}
 
 	if result.Error != nil {
