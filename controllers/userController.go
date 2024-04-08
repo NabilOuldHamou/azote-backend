@@ -98,13 +98,6 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	if len(uploadedFiles) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "No files were uploaded.",
-		})
-		return
-	}
-
 	files, err := uploadFiles(c, uploadedFiles)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -116,7 +109,10 @@ func UpdateUser(c *gin.Context) {
 	currentUserId := c.GetString("userId")
 	id, _ := uuid.Parse(currentUserId)
 
-	initializers.DB.Model(&files[0]).Update("user_id", id.String())
+	if len(uploadedFiles) == 1 {
+		initializers.DB.Model(&files[0]).Update("user_id", id.String())
+		return
+	}
 
 	var user models.User
 	result := initializers.DB.Preload("Avatar").First(&user, "id = ?", id)
