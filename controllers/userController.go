@@ -111,7 +111,6 @@ func UpdateUser(c *gin.Context) {
 
 	if len(uploadedFiles) == 1 {
 		initializers.DB.Model(&files[0]).Update("user_id", id.String())
-		return
 	}
 
 	var user models.User
